@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<!--
+RESPAWNED — Hackathon Prototype
+AI-Assisted Cognitive Gaming and Memory Support
+Prototype only — not a medical diagnostic or treatment system.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RESPAWNED — Play. Remember. Connect.</title>
+<style>
+:root{--bg:#fff8ee;--ink:#1f2937;--pri:#0f766e;--acc:#c2410c;--line:#eadfce;--sh:0 8px 24px rgba(120,80,20,.13)}
+*{box-sizing:border-box}
+html{font-size:19px}html.lg{font-size:24px}
+body{margin:0;font-family:"Trebuchet MS","Segoe UI",system-ui,Arial,sans-serif;background:linear-gradient(160deg,#fff8ee,#e3f6f1);color:var(--ink);min-height:100vh;padding-bottom:6rem;line-height:1.45}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;min-height:52px;border:2px solid var(--pri);background:#fff;border-radius:16px;padding:.6rem 1.1rem;font-weight:700;transition:transform .15s,box-shadow .15s}
+button:hover{transform:translateY(-2px);box-shadow:var(--sh)}button:active{transform:scale(.97)}
+.btn.pri{background:var(--pri);color:#fff}
+:focus-visible{outline:4px solid #1d4ed8;outline-offset:2px}
+input,select,textarea{width:100%;min-height:52px;padding:.6rem .8rem;border:2px solid #64748b;border-radius:14px;background:#fff}
+label{display:block;font-weight:700;margin:.7rem 0 .2rem}
+header{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between;padding:.7rem 1rem;background:#fff;box-shadow:var(--sh)}
+.brand{font-weight:900;font-size:1.5rem;letter-spacing:.12em;color:var(--pri)}
+.me{display:flex;align-items:center;gap:.5rem;font-weight:700;font-size:1.05rem}
+.hb{display:flex;gap:.5rem;flex-wrap:wrap}
+nav{display:flex;gap:.5rem;justify-content:center;padding:.7rem;flex-wrap:wrap}
+nav button{display:flex;gap:.4rem;align-items:center}
+nav button.on{background:var(--pri);color:#fff}
+main{max-width:1000px;margin:0 auto;padding:.5rem 1rem}
+.card{background:#fff;border-radius:24px;padding:1.2rem;box-shadow:var(--sh);margin-bottom:1rem;border:1px solid var(--line)}
+.card h2{margin:.2rem 0 .6rem;font-size:1.4rem}
+.hero{text-align:center;background:linear-gradient(135deg,#ccfbf1,#fde68a);border-radius:28px;padding:1.6rem 1rem;box-shadow:var(--sh);margin-bottom:1rem}
+.hero h1{font-size:2.6rem;letter-spacing:.14em;margin:.2rem 0;color:#0b4f4a}
+.tag{font-size:1.4rem;color:#9a3412;font-weight:800;margin:0 0 .6rem}
+.grid{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.tile{text-align:center;background:#f0fdfa;border:1px solid #99f6e4;border-radius:20px;padding:.9rem}
+.tile b{display:block;font-size:1.3rem;margin-top:.2rem}
+.btns{display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center;margin-top:1rem}
+.center{text-align:center}.huge{font-size:3rem}.big2{font-size:1.5rem}.small{font-size:.85rem;color:#475569}
+.rec{background:linear-gradient(135deg,#eef2ff,#fdf2f8);border-color:#c7d2fe}
+.row{display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap;padding:.6rem 0;border-bottom:1px dashed var(--line)}
+ul{list-style:none;padding:0;margin:0}
+.bar{display:grid;grid-template-columns:8.5rem 1fr 3.5rem;gap:.6rem;align-items:center;margin:.6rem 0}
+.trk{height:22px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+.trk i{display:block;height:100%;background:linear-gradient(90deg,#14b8a6,#0f766e);border-radius:99px;transition:width .8s}
+.cg{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}
+.cd{aspect-ratio:1;font-size:2.4rem;min-height:70px;padding:0;background:linear-gradient(135deg,#14b8a6,#0f766e);color:#fff}
+.cd.up{background:#fff;color:var(--ink)}
+.cd.ok{background:#dcfce7;border:4px solid #15803d;color:var(--ink)}
+.op{background:#fff}.op.sel{background:#ccfbf1;border-width:4px}
+.sb{font-size:2.4rem;min-height:90px;color:#fff;border:3px solid #111}
+.seq{font-size:2.2rem;font-weight:900;text-align:center;margin:1rem 0;letter-spacing:.1em}
+.sp{min-height:52px;min-width:52px;padding:.3rem .7rem}
+.mem{position:relative}.mem .huge{font-size:2.4rem}
+#toast{position:fixed;left:50%;bottom:6.5rem;transform:translate(-50%,30px);background:#1f2937;color:#fff;padding:.8rem 1.2rem;border-radius:99px;opacity:0;transition:.3s;pointer-events:none;z-index:9}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.pop{animation:pop .45s}@keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(max-width:760px){
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;box-shadow:0 -4px 16px rgba(0,0,0,.18);z-index:5;flex-wrap:nowrap;gap:.2rem;padding:.3rem}
+nav button{flex:1;flex-direction:column;gap:0;padding:.3rem .1rem;font-size:.8rem;border-width:1px;border-radius:12px;min-height:58px}
+.hero h1{font-size:1.9rem}.bar{grid-template-columns:6.5rem 1fr 3rem}.cd{font-size:1.9rem}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">RESPAWNED</div>
+  <div class="me"><span id="hi"></span><button onclick="nm()" aria-label="Change displayed name">✏️ Name</button></div>
+  <div class="hb">
+    <button id="lgb" onclick="lg()" aria-pressed="false">🔠 Large Text</button>
+    <button id="cgb" onclick="go(view=='caregiver'?'home':'caregiver')">🤝 Switch to Caregiver Mode</button>
+  </div>
+</header>
+<nav aria-label="Main navigation">
+  <button data-v="home" onclick="go('home')"><span>🏠</span>Home</button>
+  <button data-v="games" onclick="go('games')"><span>🎮</span>Games</button>
+  <button data-v="memory" onclick="go('memory')"><span>📖</span>My Memory</button>
+  <button data-v="progress" onclick="go('progress')"><span>📈</span>Progress</button>
+  <button data-v="caregiver" onclick="go('caregiver')"><span>🤝</span>Caregiver</button>
+</nav>
+<main id="app"></main>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+/* Storage helpers */
+const $=s=>document.querySelector(s);
+const ld=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sh=a=>[...a].sort(()=>Math.random()-.5);
+const DAY=864e5,D=['Easy','Medium','Hard'];
+const dn=(t=Date.now())=>Math.floor((t-new Date().getTimezoneOffset()*6e4)/DAY);
+const dl=t=>{const d=dn()-dn(t);return d<1?'Today':d==1?'Yesterday':d+' days ago'};
+const fmt=t=>{const[h,m]=t.split(':').map(Number);return(h%12||12)+':'+String(m).padStart(2,'0')+(h<12?' AM':' PM')};
+let U=ld('respawnedUser',null),S=ld('respawnedStats',null),M=ld('respawnedMemories',null),
+    R=ld('respawnedReminders',null),ST=ld('respawnedSettings',{large:false}),H=ld('respawnedActivityHistory',null);
+let view='home',T=[],iv=null,tries=0;
+const save=()=>{sv('respawnedUser',U);sv('respawnedStats',S);sv('respawnedMemories',M);sv('respawnedReminders',R);sv('respawnedSettings',ST);sv('respawnedActivityHistory',H)};
+function seed(full){
+  const n=dn();
+  if(full||!U)U={name:'Meera'};
+  S={games:12,streak:4,memory:78,sequence:84,matching:91,difficulty:'Medium',lastDay:n,seqLen:4};
+  H=[['Memory Match',91,0],['Remember Objects',80,1],['Sequence Challenge',84,1],['Memory Match',88,2],['Remember Objects',75,3],['Sequence Challenge',82,4],['Memory Match',90,5]].map(([game,pct,d])=>({game,pct,ts:Date.now()-d*DAY}));
+  if(full||!M)M=[{id:1,name:'Rohan',cat:'👨‍👩‍👧 Family',desc:'My son who lives in Pune'},{id:2,name:'Bruno',cat:'🐶 Pets',desc:'Our friendly brown dog'},{id:3,name:'Masala chai',cat:'🍲 Favorite Things',desc:'My favorite evening drink'},{id:4,name:'Mysuru house',cat:'🏡 Places',desc:'The home where I grew up'}];
+  if(full||!R)R=[{id:1,title:'💊 Morning Reminder',time:'08:00'},{id:2,title:'🍵 Afternoon Activity',time:'16:00'}];
+  save();
+}
+if(!U||!S||!H||!M||!R)seed(true);
+const avg=(n=5)=>H.length?Math.round(H.slice(0,n).reduce((a,h)=>a+h.pct,0)/Math.min(n,H.length)):0;
+function adjust(){const a=avg(),i=D.indexOf(S.difficulty);S.difficulty=D[a>=85?Math.min(2,i+1):a<60?Math.max(0,i-1):i]}
+function recommendNextActivity(){const a=avg(),c=[['Remember Objects',S.memory],['Sequence Challenge',S.sequence],['Memory Match',S.matching]].sort((x,y)=>x[1]-y[1]);const game=a<60?'Memory Match':c[0][0];const msg=a>=85?"Your previous performance suggests you're ready for a slightly harder challenge.":a<60?"Let's try something gentler today. Easy steps still keep the mind active.":"You're doing steadily well, so we'll keep the challenge at the same level.";return{game,diff:S.difficulty,msg}}
+const rec=recommendNextActivity;
+const KEY={'Remember Objects':'memory','Personal Recall':'memory','Sequence Challenge':'sequence','Memory Match':'matching'};
+const ICO={'Memory Match':'🎮','Remember Objects':'🧠','Sequence Challenge':'🔢','Personal Recall':'💭'};
+function record(game,pct){const k=KEY[game];S[k]=Math.round(S[k]*.6+pct*.4);S.games++;const n=dn();if(S.lastDay!==n){S.streak=S.lastDay===n-1?S.streak+1:1;S.lastDay=n}H.unshift({game,pct,ts:Date.now()});H=H.slice(0,30);adjust();save()}
+function speak(t){try{if(!('speechSynthesis'in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-say]');if(b)speak(b.dataset.say)});
+const sp=t=>`<button class="sp" data-say="${esc(t)}" aria-label="Read aloud: ${esc(t)}">🔊</button>`;
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2300)}
+function clr(){T.forEach(clearTimeout);T=[];clearInterval(iv);try{speechSynthesis.cancel()}catch(e){}}
+function apply(){document.documentElement.classList.toggle('lg',!!ST.large);$('#lgb').setAttribute('aria-pressed',!!ST.large);$('#lgb').textContent='🔠 Large Text: '+(ST.large?'On':'Off')}
+function lg(){ST.large=!ST.large;apply();save()}
+function nm(){const n=prompt('What should we call you?',U.name);if(n&&n.trim()){U.name=n.trim().slice(0,20);save();render()}}
+const tile=(i,l,v)=>`<div class="tile"><div class="huge">${i}</div>${l}<b>${v}</b></div>`;
+const bars=()=>[['🧠 Memory',S.memory],['🔢 Sequence',S.sequence],['🎮 Matching',S.matching]].map(([l,v])=>`<div class="bar"><span>${l}</span><div class="trk" role="progressbar" aria-label="${l}" aria-valuenow="${v}" aria-valuemin="0" aria-valuemax="100"><i style="width:${v}%"></i></div><b>${v}%</b></div>`).join('');
+const recent=(n=5)=>`<ul>${H.slice(0,n).map(h=>`<li class="row"><span>${ICO[h.game]||'💭'} ${h.game}</span><span><b>${h.pct}%</b> — ${dl(h.ts)}</span></li>`).join('')}</ul>`;
+function recCard(){const r=rec();return`<div class="card rec"><h2>🤖 Personalized Recommendation</h2><p>Based on your recent activities, we recommend:</p><p class="big2"><b>${r.game} — ${r.diff}</b></p><p>${r.msg}</p><p class="small">An AI-assisted adaptive prototype using simple on-device rules — not a clinical tool.</p><button class="btn pri" onclick="start('${r.game}')">▶️ Try it now</button></div>`}
+function remList(edit){return R.length?`<ul>${R.map(r=>`<li class="row"><span>⏰ ${esc(r.title)} — <b>${fmt(r.time)}</b></span>${edit?`<button onclick="delRem(${r.id})" aria-label="Delete reminder ${esc(r.title)}">🗑️ Delete</button>`:''}</li>`).join('')}</ul>`:'<p>No reminders yet.</p>'}
+function chart(){const d=H.slice(0,7).reverse(),w=360/Math.max(d.length,1);return`<svg viewBox="0 0 360 175" role="img" aria-label="Bar chart of recent activity scores" style="width:100%"><line x1="0" y1="140" x2="360" y2="140" stroke="#64748b" stroke-width="2"/>${d.map((h,i)=>{const bh=h.pct*1.15,x=i*w+w*.15;return`<rect x="${x}" y="${140-bh}" width="${w*.7}" height="${bh}" rx="6" fill="#0f766e"/><text x="${x+w*.35}" y="${134-bh}" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2937">${h.pct}</text><text x="${x+w*.35}" y="162" text-anchor="middle" font-size="16">${ICO[h.game]||'💭'}</text>`}).join('')}</svg>`}
+const V={
+home(){const r=rec();return`<section class="hero"><div class="huge">🌻🎮</div><h1>RESPAWNED</h1><p class="tag">Play. Remember. Connect.</p><p>Personalized cognitive activities designed to keep your mind active and your memories close.</p><div class="grid"><button class="btn pri" onclick="start(rec().game)">▶️ Start Today's Activity</button><button class="btn" onclick="go('games')">🎮 Play Games</button><button class="btn" onclick="go('memory')">📖 My Memories</button><button class="btn" onclick="go('progress')">📈 My Progress</button></div></section><div class="card"><h2>☀️ Today's Memory Adventure ${sp("Today's memory adventure is "+r.game)}</h2><div class="grid">${tile('🎯','Recommended',r.game)}${tile('🌱','Difficulty',r.diff)}${tile('🔥','Daily streak',S.streak+' days')}${tile('✅','Activities completed',S.games)}</div></div><div class="card"><h2>⏰ Today's Reminders</h2>${remList(false)}</div><p class="small center">Respawned is a cognitive-support prototype and is not a medical diagnostic or treatment tool.</p>`},
+games(){const g=(i,t,d,k)=>`<div class="card center"><div class="huge">${i}</div><h2>${t}</h2><p>${d}</p><button class="btn pri" onclick="start('${k}')">▶️ Play</button></div>`;return`<h1>🎮 Games</h1><div class="grid">${g('🃏','Memory Match','Find the 4 matching pairs.','Memory Match')}${g('🧺','Remember the Objects','Remember 5 everyday objects.','Remember Objects')}${g('🔢','Sequence Challenge','Repeat the number order.','Sequence Challenge')}</div>${recCard()}`},
+memory(){const cats=['👨‍👩‍👧 Family','🍲 Favorite Things','🏡 Places','🐶 Pets','📅 Important Dates'];return`<h1>📖 My Memory Book</h1><div class="card"><h2>➕ Add a memory</h2><form onsubmit="addMem(event)"><label for="nm">Person/Item</label><input id="nm" name="nm" required maxlength="40" placeholder="Ananya"><label for="ct">Relationship/Category</label><select id="ct" name="ct">${cats.map(c=>`<option>${c}</option>`).join('')}</select><label for="ds">Description</label><textarea id="ds" name="ds" required maxlength="120" rows="2" placeholder="My granddaughter"></textarea><div class="btns"><button class="btn pri" type="submit">💾 Save Memory</button><button class="btn" type="button" onclick="start('Personal Recall')">🎲 Create Memory Game</button></div></form></div>${M.length?`<div class="grid">${M.map(m=>`<div class="card mem"><div class="huge">${m.cat.split(' ')[0]}</div><h2>${esc(m.name)}</h2><p><b>${m.cat.split(' ').slice(1).join(' ')}</b></p><p>${esc(m.desc)}</p><button onclick="delMem(${m.id})" aria-label="Delete memory ${esc(m.name)}">🗑️ Delete</button></div>`).join('')}</div>`:'<div class="card center"><p>Your Memory Book is empty. Add the first memory above. 🌸</p></div>'}`},
+progress(){return`<h1>📈 My Progress</h1><div class="grid">${tile('🎮','Games Completed',S.games)}${tile('🔥','Current Streak',S.streak+' days')}${tile('🎯','Average Accuracy',avg()+'%')}${tile('🌱','Current Difficulty',S.difficulty)}</div><br><div class="card"><h2>Skill areas</h2>${bars()}</div><div class="card"><h2>Recent score chart</h2>${chart()}</div><div class="card"><h2>Recent Activity</h2>${recent(6)}</div>${recCard()}<p class="center big2">Every small activity is a step toward staying mentally active. 🌻</p>`},
+caregiver(){const done=S.lastDay===dn();return`<h1>🤝 Caregiver Dashboard</h1><div class="grid">${tile('👤','User',esc(U.name))}${tile(done?'✅':'⏳',"Today's activity",done?'Completed ✓':'Not yet today')}${tile('📊','Overall activity score',avg()+'%')}${tile('🎮','Games completed',S.games)}${tile('🌱','Current difficulty',S.difficulty)}${tile('🔥','Current streak',S.streak+' days')}</div><br><div class="card"><h2>Category performance</h2>${bars()}</div><div class="card"><h2>Recent activity</h2>${recent(6)}</div>${recCard()}<div class="card"><h2>⏰ Reminders</h2>${remList(true)}<form onsubmit="addRem(event)"><label for="rt">Reminder title</label><input id="rt" name="t" required maxlength="40" placeholder="🚶 Evening walk"><label for="rm">Time</label><input id="rm" name="tm" type="time" required value="09:00"><div class="btns"><button class="btn pri" type="submit">➕ Set Reminder</button></div></form><p class="small">Reminders are shown inside the app for this prototype.</p></div><div class="btns"><button class="btn pri" onclick="go('memory')">📖 Personalize Memory</button><button class="btn" onclick="demoMode()">✨ Demo Mode</button><button class="btn" onclick="resetAll()">♻️ Reset Demo Data</button></div>`}
+};
+function render(){document.querySelectorAll('nav button').forEach(b=>{const on=b.dataset.v==view;b.classList.toggle('on',on);on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current')});$('#app').innerHTML=V[view]();$('#hi').textContent='Welcome back, '+U.name+'! 🌻';$('#cgb').textContent=view=='caregiver'?'🏠 Exit Caregiver Mode':'🤝 Switch to Caregiver Mode'}
+function go(v){clr();view=v;render();window.scrollTo(0,0)}
+function addMem(e){e.preventDefault();const f=e.target;M.unshift({id:Date.now(),name:f.nm.value.trim(),cat:f.ct.value,desc:f.ds.value.trim()});save();render();toast('Memory saved 💛')}
+function delMem(id){M=M.filter(m=>m.id!==id);save();render();toast('Memory deleted')}
+function addRem(e){e.preventDefault();const f=e.target;R.push({id:Date.now(),title:f.t.value.trim(),time:f.tm.value});R.sort((a,b)=>a.time.localeCompare(b.time));save();render();toast('Reminder saved ⏰')}
+function delRem(id){R=R.filter(r=>r.id!==id);save();render()}
+function demoMode(){seed(false);render();toast('Demo progress loaded ✨')}
+function resetAll(){if(confirm('Reset all demo data?')){seed(true);render();toast('Demo data reset')}}
+const GM={'Memory Match':()=>mm(),'Remember Objects':()=>ob(),'Sequence Challenge':()=>sq(),'Personal Recall':()=>rc()};
+function start(g){clr();view='games';tries=0;render();GM[g]()}
+function res(emoji,title,sub,items,again){$('#app').innerHTML=`<div class="card center pop"><div class="huge">${emoji}</div><h1>${title}</h1><p class="big2">${sub}</p><div class="grid">${items.map(i=>`<div class="tile">${i[0]}<b>${i[1]}</b></div>`).join('')}</div><div class="btns"><button class="btn pri" onclick="${again}()">🔁 Play Again</button><button class="btn" onclick="go('games')">⬅️ Back to Games</button><button class="btn" onclick="go('progress')">📈 My Progress</button></div></div>`;window.scrollTo(0,0)}
+function mm(){clr();const e=['🍎','🌸','🐶','🚗'],c=sh([...e,...e]);let open=[],lock=false,att=0,mt=0,t0=0;$('#app').innerHTML=`<div class="card center"><h2>🃏 Memory Match ${sp('Find the matching pairs. Tap a card to flip it.')}</h2><p>Find the matching pairs. Tap a card to flip it.</p><p>Attempts: <b id="a">0</b> &nbsp; Matches: <b id="m">0</b>/4 &nbsp; Time: <b id="t">0</b>s</p><div class="cg">${c.map((_,i)=>`<button class="cd" aria-label="Card ${i+1}, face down">?</button>`).join('')}</div></div>`;const b=[...document.querySelectorAll('.cd')];const flip=(x,i)=>{x.classList.add('up');x.textContent=c[i];x.setAttribute('aria-label','Card '+(i+1)+': '+c[i])};const unflip=(x,i)=>{x.classList.remove('up');x.textContent='?';x.setAttribute('aria-label','Card '+(i+1)+', face down')};const upd=()=>{$('#a').textContent=att;$('#m').textContent=mt};b.forEach((x,i)=>x.onclick=()=>{if(lock||x.classList.contains('up'))return;if(!t0){t0=Date.now();iv=setInterval(()=>{const t=$('#t');if(t)t.textContent=Math.round((Date.now()-t0)/1000)},1000)}flip(x,i);open.push(i);if(open.length==2){att++;const[p,q]=open;open=[];if(c[p]==c[q]){mt++;b[p].classList.add('ok');b[q].classList.add('ok');upd();if(mt==4){clearInterval(iv);const secs=Math.round((Date.now()-t0)/1000),pct=Math.round(4/att*100);record('Memory Match',pct);res('🎉','Wonderful! 🎉','You completed the Memory Match.',[['⭐ Score',pct],['🔁 Attempts',att],['⏱️ Time',secs+'s']],'mm')}}else{upd();lock=true;T.push(setTimeout(()=>{unflip(b[p],p);unflip(b[q],q);lock=false},900))}}})}
+const OB=[['🍎','Apple'],['🔑','Keys'],['☕','Cup'],['📖','Book'],['🌸','Flower'],['🕶️','Glasses'],['🎈','Balloon'],['🧦','Sock'],['🚗','Car'],['🔔','Bell']];
+function ob(){clr();const p=sh(OB),tg=p.slice(0,5),ds=p.slice(5,8),secs={Easy:6,Medium:5,Hard:4}[S.difficulty]||5;$('#app').innerHTML=`<div class="card center"><h2>🧺 Remember the Objects ${sp('Remember these objects.')}</h2><p class="big2">Remember these objects.</p><div class="grid">${tg.map(o=>`<div class="tile"><span class="huge">${o[0]}</span><b>${o[1]}</b></div>`).join('')}</div><p>Hiding in <b id="cd">${secs}</b> seconds…</p></div>`;let s=secs;iv=setInterval(()=>{s--;const e=$('#cd');if(e)e.textContent=Math.max(s,0)},1000);T.push(setTimeout(()=>{clearInterval(iv);obPick(tg,ds)},secs*1000))}
+function obPick(tg,ds){const all=sh([...tg,...ds]),sel=new Set();$('#app').innerHTML=`<div class="card center"><h2>🤔 Which objects did you see? ${sp('Which objects did you see?')}</h2><p>Tap every object you remember, then press Check.</p><div class="grid">${all.map((o,i)=>`<button class="op" data-i="${i}" aria-pressed="false"><span class="huge">${o[0]}</span><br>${o[1]}<span class="tk"></span></button>`).join('')}</div><div class="btns"><button class="btn pri" id="ck">✅ Check My Answers</button></div></div>`;document.querySelectorAll('.op').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel.has(i)?sel.delete(i):sel.add(i);const on=sel.has(i);b.classList.toggle('sel',on);b.setAttribute('aria-pressed',on);b.querySelector('.tk').textContent=on?' ✓':''});$('#ck').onclick=()=>{const picked=[...sel].map(i=>all[i]),names=tg.map(o=>o[1]),good=picked.filter(o=>names.includes(o[1])).length,bad=picked.length-good,pct=Math.round(Math.max(0,good-bad)/5*100);record('Remember Objects',pct);const L=a=>a.map(o=>o[0]+' '+o[1]).join(', ')||'Nothing';res(pct>=60?'🌟':'🌼',pct>=60?'Great remembering! 🌟':'Good effort! 🌼',`${good} out of 5 remembered`,[['✅ Correct answers',L(tg)],['👆 You selected',L(picked)],['📊 Accuracy',pct+'%']],'ob')}}
+const COL={1:'#b91c1c',2:'#1d4ed8',3:'#15803d',4:'#92400e'};
+function sq(){clr();const L=S.seqLen,s=Array.from({length:L},()=>1+Math.floor(Math.random()*4));$('#app').innerHTML=`<div class="card center"><h2>🔢 Sequence Challenge ${sp('Remember this order.')}</h2><p class="big2">Remember this order:</p><div class="seq">${s.join(' → ')}</div><p>Sequence length: ${L}</p></div>`;T.push(setTimeout(()=>sqAsk(s),2000+L*800))}
+function sqAsk(s){const inp=[];tries++;$('#app').innerHTML=`<div class="card center"><h2>👆 Your turn ${sp('Tap the numbers in the same order.')}</h2><p>Tap the numbers in the same order.</p><div class="seq" id="dots" aria-live="polite">${s.map(()=>'•').join(' ')}</div><div class="cg">${[1,2,3,4].map(n=>`<button class="sb" style="background:${COL[n]}" data-n="${n}" aria-label="Button ${n}">${n}</button>`).join('')}</div></div>`;document.querySelectorAll('.sb').forEach(b=>b.onclick=()=>{inp.push(+b.dataset.n);$('#dots').textContent=inp.concat(s.slice(inp.length).map(()=>'•')).join(' ');if(inp.length==s.length){const hit=s.filter((v,i)=>v==inp[i]).length,pct=Math.round(hit/s.length*100),ok=hit==s.length;record('Sequence Challenge',pct);S.seqLen=ok?Math.min(6,s.length+1):Math.max(3,s.length-1);save();res(ok?'🧠':'💪',ok?'Excellent! 🧠✨':"Good try! Let's practice once more.",'The sequence was '+s.join(' → '),[['📏 Sequence length',s.length],['🔁 Attempts',tries],['🎯 Accuracy',pct+'%']],'sq')}})}
+function rc(){clr();if(!M.length){toast('Add a memory first 🌸');return go('memory')}const m=M[Math.floor(Math.random()*M.length)];$('#app').innerHTML=`<div class="card center"><h2>💭 Memory Book Question ${sp('Who is '+m.name+'?')}</h2><div class="huge">${m.cat.split(' ')[0]}</div><p class="big2">Who is <b>${esc(m.name)}</b>?</p><button class="btn pri" id="sa">👀 Show Answer</button><div id="an"></div></div>`;$('#sa').onclick=()=>{$('#sa').hidden=true;$('#an').innerHTML=`<p class="big2 pop"><b>${esc(m.desc)}</b></p><p>Did you remember?</p><div class="btns"><button class="btn pri" onclick="rcDone(100)">😊 Yes, I remembered</button><button class="btn" onclick="rcDone(60)">🤔 Not yet</button></div>`}}
+function rcDone(p){record('Personal Recall',p);res(p==100?'🌟':'🌼',p==100?'Wonderful! 🎉':'Nice try! 🌼','Every memory practice counts.',[['⭐ Score',p+'%']],'rc')}
+apply();render();
+</script>
+</body>
+</html>
